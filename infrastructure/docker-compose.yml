@@ -1,7 +1,15 @@
+# The API is intentionally NOT containerized: its diagnostics must run against
+# the host (docker, systemctl, journalctl). Run it on the host instead:
+#   cd backend && .venv/bin/uvicorn app.main:app --port 8000
+# To run a degraded containerized API anyway: docker compose --profile container up
 services:
   api:
+    profiles: ["container"]
     build: ../backend
     ports: ["8000:8000"]
+    env_file:
+      - path: ../.env
+        required: false
     environment:
       - APP_ENV=development
       - PYTHONDONTWRITEBYTECODE=1
@@ -17,7 +25,6 @@ services:
     volumes:
       - ../frontend:/app
       - web_node_modules:/app/node_modules
-    depends_on: [api]
 
 volumes:
   web_node_modules:
